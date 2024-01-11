@@ -1,43 +1,38 @@
-version: '2.2'
+version: "2.2"
 services:
-  elastic-trombi:
+  # --ELASTICSEARCH--
+  elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
-    container_name: elastic-trombi
+    container_name: elasticsearch
     environment:
-      - node.name=elastic-trombi
-      - cluster.name=es-docker-cluster
-      - cluster.initial_master_nodes=elastic-trombi
-      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+      - TAKE_FILE_OWNERSHIP=true
     ulimits:
       memlock:
         soft: -1
         hard: -1
     volumes:
-      - data01:/usr/share/elasticsearch/data
+      - elasticsearch-data:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     networks:
-      - elastic
+      - elk
 
   # --BACK--
-  node-app:
+  back:
     build:
       context: ./back
-    container_name: trombi-back
+    container_name: back
     ports:
       - 3000:3000
     networks:
-      - elastic
-
-volumes:
-  data01:
-    driver: local
-  data02:
-    driver: local
-  data03:
-    driver: local
+      - elk
 
 networks:
-  elastic:
+  elk:
     driver: bridge
+
+volumes:
+  elasticsearch-data:
+    driver: local
