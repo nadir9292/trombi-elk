@@ -1,91 +1,21 @@
 import { Button, Input, Typography } from "@material-tailwind/react"
 import { useState } from "react"
-
-const toto = {
-  employees: [
-    {
-      id: 1,
-      name: "nadir",
-      firstname: "mans",
-      job: "dev",
-    },
-    {
-      id: 2,
-      name: "toto",
-      firstname: "tito",
-      job: "dev",
-    },
-    {
-      id: 1,
-      name: "nadir",
-      firstname: "mans",
-      job: "dev",
-    },
-    {
-      id: 2,
-      name: "toto",
-      firstname: "tito",
-      job: "dev",
-    },
-    {
-      id: 1,
-      name: "nadir",
-      firstname: "mans",
-      job: "dev",
-    },
-    {
-      id: 2,
-      name: "toto",
-      firstname: "tito",
-      job: "dev",
-    },
-    {
-      id: 1,
-      name: "nadir",
-      firstname: "mans",
-      job: "dev",
-    },
-    {
-      id: 2,
-      name: "toto",
-      firstname: "tito",
-      job: "dev",
-    },
-    {
-      id: 1,
-      name: "nadir",
-      firstname: "mans",
-      job: "dev",
-    },
-    {
-      id: 2,
-      name: "toto",
-      firstname: "tito",
-      job: "dev",
-    },
-    {
-      id: 1,
-      name: "nadir",
-      firstname: "mans",
-      job: "dev",
-    },
-    {
-      id: 2,
-      name: "toto",
-      firstname: "tito",
-      job: "dev",
-    },
-  ],
-}
+import axios from "axios"
 
 const Home = () => {
   const [label, setLabel] = useState("")
-  const [data, setData] = useState([])
+  const [searchedData, setSearchedData] = useState(null)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    setData(toto)
-    console.log(event.currentTarget.searchLabel.value)
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/search/employee?field=job&value=${label}`
+      )
+      setSearchedData(response.data)
+    } catch (err) {
+      console.error("ERROR : ", err)
+    }
   }
 
   return (
@@ -127,18 +57,18 @@ const Home = () => {
           </Button>
         </form>
         <div className="grid grid-cols-3 gap-4 mt-8">
-          {data && data.employees && data.employees.length > 0 ? (
-            data.employees.map(({ id, name, firstname, job }, index) => (
+          {searchedData && searchedData.length > 0 ? (
+            searchedData.map(({ first_name, last_name, job, age }, index) => (
               <div
                 key={index}
                 className="hover:scale-105 shadow-lg bg-red-400 py-4 px-4 rounded-xl"
               >
                 <div className="mt-4 grid grid-cols-1">
-                  <Typography color="white">{id}</Typography>
                   <Typography color="white" className="items-center font-bold">
-                    {name} {firstname}
+                    {first_name} {last_name}
                   </Typography>
-                  <Typography color="white">{job}</Typography>
+                  <Typography color="white">Job : {job}</Typography>
+                  <Typography color="white">Age : {age}</Typography>
                 </div>
               </div>
             ))
