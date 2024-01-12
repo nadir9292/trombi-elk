@@ -21,6 +21,27 @@ const insertData = (client) => {
       age: 25,
       job: "Developper",
     },
+    { index: { _index: "employee", _type: "_doc" } },
+    {
+      first_name: "Toto",
+      last_name: "toto",
+      age: 25,
+      job: "CEO",
+    },
+    { index: { _index: "employee", _type: "_doc" } },
+    {
+      first_name: "Quentin",
+      last_name: "Ma",
+      age: 25,
+      job: "Developper",
+    },
+    { index: { _index: "employee", _type: "_doc" } },
+    {
+      first_name: "Sami",
+      last_name: "po",
+      age: 25,
+      job: "CTO",
+    },
   ];
   client.bulk({ refresh: true, body });
 };

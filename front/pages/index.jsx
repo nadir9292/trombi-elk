@@ -1,10 +1,44 @@
 import { Button, Input, Typography } from "@material-tailwind/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 
 const Home = () => {
   const [label, setLabel] = useState("")
-  const [searchedData, setSearchedData] = useState(null)
+  const [searchedData, setSearchedData] = useState([])
+  const [suggestions, setSuggestions] = useState([])
+
+  useEffect(() => {
+    // Mettez à jour les suggestions basées sur la valeur actuelle du label ici
+    // Vous pouvez appeler votre endpoint Elasticsearch pour récupérer les suggestions
+    // Utilisez une annulation différée pour éviter les appels inutiles lors de la frappe rapide
+    const delayedFetchSuggestions = setTimeout(() => {
+      fetchSuggestions()
+    }, 300)
+
+    return () => clearTimeout(delayedFetchSuggestions)
+  }, [label])
+
+  const fetchSuggestions = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/search/employee?field=job&value=${label}`
+      )
+
+      const uniqueJobSet = new Set(
+        response.data.map((employee) => employee.job)
+      )
+
+      const uniqueJobSuggestions = [...uniqueJobSet]
+      setSuggestions(uniqueJobSuggestions)
+    } catch (err) {
+      console.error("ERROR fetching suggestions: ", err)
+    }
+  }
+
+  const handleSelectSuggestion = (selectedValue) => {
+    // Mettez à jour le label avec la suggestion sélectionnée
+    setLabel(selectedValue)
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -14,7 +48,7 @@ const Home = () => {
       )
       setSearchedData(response.data)
     } catch (err) {
-      console.error("ERROR : ", err)
+      console.error("ERROR: ", err)
     }
   }
 
@@ -25,7 +59,7 @@ const Home = () => {
           <div className="mb-1 flex flex-col gap-6">
             <Input
               size="lg"
-              placeholder="name, firstname, job , etc"
+              placeholder="name, firstname, job, etc"
               className="px-2 py-4 border border-2 border-gray-900 !border-t-blue-gray-300  w-full bg-gray-300 rounded-lg focus:!border-t-gray-900 placeholder-gray-900"
               name="searchLabel"
               value={label}
@@ -34,6 +68,16 @@ const Home = () => {
                 className: "before:content-none after:content-none",
               }}
             />
+            <ul className="bg-gray-100 rounded-xl py-3 px-2">
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleSelectSuggestion(suggestion)}
+                >
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
           </div>
           <Button
             type="submit"

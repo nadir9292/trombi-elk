@@ -22,10 +22,38 @@ const employeeRoute = ({ app, client }) => {
       });
 
       const result = responseBody.hits.hits.map((item) => item._source);
+
+      if (value === "" || !value) {
+        res.send([]);
+        return;
+      }
       res.send(result);
     } catch (error) {
       console.error(error);
       res.status(404).send("Data not found !");
+    }
+  });
+
+  app.post("/insert-data", async (req, res) => {
+    const {
+      body: { first_name, last_name, job, age },
+    } = req;
+
+    try {
+      const body = [
+        { index: { _index: "employee", _type: "_doc" } },
+        {
+          first_name: first_name,
+          last_name: last_name,
+          age: age,
+          job: job,
+        },
+      ];
+      client.bulk({ refresh: true, body });
+
+      res.status(200).send(body);
+    } catch (err) {
+      res.status(401).send(err);
     }
   });
 };
